@@ -131,7 +131,7 @@ plugins: [
 
 ### 6. Loader(css) : MiniCssExtractPlugin
 
-css파일을 생성!
+css파일을 생성하고, 생성되는 html 안에 `<link>`태그로 작성된다.
 
 ```yarn
 yarn add mini-css-extract-plugin --dev
