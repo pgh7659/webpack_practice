@@ -1,0 +1,8 @@
+{
+  "name": "webpack_practice",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/pgh7659/webpack_practice.git",
+  "author": "ghpark <pgh7659@naver.com>",
+  "license": "MIT"
+}
