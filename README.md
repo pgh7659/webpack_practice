@@ -94,3 +94,25 @@ plugins: [
 ```
 
 yarn build를 실행하면 dist 폴더 내에 index.html 파일이 생성된다!
+
+1. clear-webpack-plugin & bundle.[hash].js
+
+새로 bundling된 경우, bundle파일이 변경되었음을 알 수 있도록 파일명에 hash값 추가.
+clear-webpack-plugin: 기존의 bundle파일은 삭제(최신 bundle파일만 남는다)
+
+```yarn
+yarn add clear-webpack-plugin --dev
+```
+
+```javascript
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+...
+
+plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html'
+    }),
+    new CleanWebpackPlugin() // 최신 bundle파일만 남도록!!
+  ]
+```
