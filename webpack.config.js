@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   entry: './src/js/index.js',
@@ -13,9 +14,12 @@ module.exports = {
       {
         test: /\.css$/i,
         use: [
+          // {
+          //   loader: 'style-loader',
+          //   options: {injectType: 'singletonStyleTag'}
+          // },
           {
-            loader: 'style-loader',
-            options: {injectType: 'singletonStyleTag'}
+            loader: MiniCssExtractPlugin.loader
           },
           {
             loader: 'css-loader'
@@ -28,6 +32,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/index.html'
     }),
-    new CleanWebpackPlugin() // 최신 bundle파일만 남도록!!
+    new CleanWebpackPlugin(), // 최신 bundle파일만 남도록!!
+    new MiniCssExtractPlugin({filename: 'style.css'}),
   ]
 }
