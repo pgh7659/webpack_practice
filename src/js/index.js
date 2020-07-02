@@ -1,3 +1,5 @@
+import '../css/style.css';
+
 const currentTime = () => {
   const date = new Date();
   const hour = date.getHours();
