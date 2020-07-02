@@ -1,2 +1,11 @@
 # log file
 *.log
+
+# node_modules
+node_modules
+
+#yarn
+yarn*
+
+#dist
+dist
