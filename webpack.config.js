@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
   entry: './src/js/index.js',
   output: {
-    filename: 'bundle.[hash].js', // bundle파일이 변경되었음을 알수있도록 bundle.hash값.js => bundling시에만!
+    filename: 'bundle.[hash].js', // bundle파일이 변경되었음을 알수있도록 bundle.hash값.js
     path: path.resolve(__dirname, 'dist')
   },
   module: {
@@ -30,9 +30,14 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html'
+      template: './src/index.html',
+      title: 'WEBPACK | PRACTICE',
+      meta: {
+        viewport: 'width=device-width, initial-scale=1.0',
+        charset: 'utf-8'
+      }
     }),
     new CleanWebpackPlugin(), // 최신 bundle파일만 남도록!!
-    new MiniCssExtractPlugin({filename: 'style.css'}),
+    new MiniCssExtractPlugin({filename: 'style.[contenthash].css'}), // css 파일에도 hash값 적용
   ]
 }
