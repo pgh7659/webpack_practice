@@ -28,6 +28,11 @@ yarn add webpack webpack-cli ---dev
 entry: 시작점. 모듈의 참조관계를 통해 의존성그래프를 만들기 위해 entry를 지정해준다.  
 output: bundle된 파일
 
+  
+<br>  
+
+_webpack.config.js_
+
 ```javascript
 const path = require('path');
 
@@ -50,8 +55,10 @@ Loader의 예시로 style-loader,css-loader 사용하여 css 파일 bundle!
 ```yarn
 yarn add style-loader css-loader --dev
 ```
+  
+<br>  
 
-webpack.config.js 파일에 추가
+_webpack.config.js_
 
 ```javascript
 module: {
@@ -74,6 +81,10 @@ module: {
 
 entry의 js파일 상단에서 import 'style.css';를 하면 알아서 읽어서 style 태그로 만들어줍니다  
 index.js에서 style.css import => bundle.js를 통해 css 적용
+  
+<br>  
+
+_index.js_
 
 ```javascript
 import '../css/style.css';
@@ -88,6 +99,10 @@ html-webpack-plugin을 사용: bundle된 파일이 들어간 html생성해준다
 ```yarn
 yarn add html-webpack-plugin --dev
 ```
+  
+<br>  
+
+_webpack.config.js_
 
 ```javascript
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -122,6 +137,10 @@ yarn add mini-css-extract-plugin --dev
 ```
 
 > 절대로 style-loader를 넣어서는 안된다! style-loader는 서버 사이드 렌더링을 지원하지 않는다.
+  
+<br>  
+
+_webpack.config.js_
 
 ```javascript
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -170,6 +189,10 @@ clear-webpack-plugin: 기존의 bundle파일은 삭제(최신 bundle파일만 �
 ```yarn
 yarn add clear-webpack-plugin --dev
 ```
+  
+<br>  
+
+_webpack.config.js_
 
 ```javascript
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -194,3 +217,60 @@ plugins: [
 [hash]적용 시, js파일의 수정으로 build 시 css파일의 hash까지 변경된다. cache 사용이 무의미.
 
 ---
+
+## STEP3 chunk
+
+bundling을 통해 하나의 파일로 묶으면서 파일의 크기가 커지는 문제가 발생한다.  
+이를 chunk를 통해 bundle파일을 덩어리로 구분하여 나눈다.  
+    - runtime chunk
+    - vendor chunk
+
+### 1.runtimeChunk
+
+runtime에서 쓰이는 고정적인 모듈들과 나머지 모듈들을 구분.(runtime.js로 생성)  
+  
+<br>  
+
+_webpack.config.js_
+
+```javascript
+output: {
+  filename: '[name].[chunkhash].js', // bundle파일이 변경되었음을 알수있도록 name.hash값.js
+  path: path.resolve(__dirname, 'dist')
+},  
+
+...  
+
+optimization: { // webpack 최적화를 담당
+  runtimeChunk: 'single',
+},
+```
+
+### 2. vendorChunk
+
+외부의 모듈들을 따로 vendors로 구분.(vendors.js로 생성)  
+  
+<br>  
+
+_webpack.config.js_
+
+```javascript
+output: {
+  filename: '[name].[chunkhash].js', // bundle파일이 변경되었음을 알수있도록 name.hash값.js
+  path: path.resolve(__dirname, 'dist')
+},  
+
+...  
+
+optimization: { // webpack 최적화를 담당
+  splitChunks: {
+    cacheGroups: {
+      commons: {
+        test: /[\\/]node_modules[\\/]/,
+        name: 'vendors',
+        chunks: 'all'
+      }
+    }
+  }
+},
+```

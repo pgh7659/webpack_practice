@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
   entry: './src/js/index.js',
   output: {
-    filename: 'bundle.[hash].js', // bundle파일이 변경되었음을 알수있도록 bundle.hash값.js
+    filename: '[name].[chunkhash].js', // bundle파일이 변경되었음을 알수있도록 name.hash값.js
     path: path.resolve(__dirname, 'dist')
   },
   module: {
@@ -34,10 +34,22 @@ module.exports = {
       title: 'WEBPACK | PRACTICE',
       meta: {
         viewport: 'width=device-width, initial-scale=1.0',
-        charset: 'utf-8'
       }
     }),
     new CleanWebpackPlugin(), // 최신 bundle파일만 남도록!!
     new MiniCssExtractPlugin({filename: 'style.[contenthash].css'}), // css 파일에도 hash값 적용
-  ]
+  ],
+  optimization: { // webpack 최적화를 담당
+    runtimeChunk: 'single',
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all'
+        }
+      }
+    }
+  },
+  mode: 'none'
 }
