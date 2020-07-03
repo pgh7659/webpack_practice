@@ -10,7 +10,7 @@
       + 사용하지 않는 코드를 제거
       + 파일의 크기를 축소
 
-## STEP1
+## STEP1 기본 설정
 
 ### 1. webpack, webpack-cli 설치
 
@@ -96,40 +96,24 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html'
-    })
-  ]
-```
-
-yarn build를 실행하면 dist 폴더 내에 index.html 파일이 생성된다!
-
----
-
-### 5. PlugIn : clear-webpack-plugin && bundle.[hash].js
-
-새로 bundling된 경우, bundle파일이 변경되었음을 알 수 있도록 파일명에 hash값 추가.  
-clear-webpack-plugin: 기존의 bundle파일은 삭제(최신 bundle파일만 남는다)
-
-```yarn
-yarn add clear-webpack-plugin --dev
-```
-
-```javascript
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-
-...
-
-plugins: [
-    new HtmlWebpackPlugin({
-      template: './src/index.html'
+      template: './src/index.html',
+      title: 'WEBPACK | PRACTICE',
+      meta: {
+        viewport: 'width=device-width, initial-scale=1.0',
+        charset: 'utf-8'
+      }
     }),
     new CleanWebpackPlugin() // 최신 bundle파일만 남도록!!
   ]
 ```
 
+> title, meta를 이용해 `<title>`, `<meta>`를 추가할 수 있다.
+
+yarn build를 실행하면 dist 폴더 내에 index.html 파일이 생성된다!
+
 ---
 
-### 6. Loader(css) : MiniCssExtractPlugin
+### 5. Loader(css) : MiniCssExtractPlugin
 
 css파일을 생성하고, 생성되는 html 안에 `<link>`태그로 작성된다.
 
@@ -137,7 +121,7 @@ css파일을 생성하고, 생성되는 html 안에 `<link>`태그로 작성된�
 yarn add mini-css-extract-plugin --dev
 ```
 
-> 절대로 style-loader를 넣어서는 안 됩니다! style-loader는 서버 사이드 렌더링을 지원하지 않습니다.
+> 절대로 style-loader를 넣어서는 안된다! style-loader는 서버 사이드 렌더링을 지원하지 않는다.
 
 ```javascript
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -164,7 +148,49 @@ module: {
         ]
       }
     ]
-  }
+  },
+  plugins: [  
+    ...  
+    new MiniCssExtractPlugin()
+  ]
 ```
+
+---
+
+## STEP2 효과적 Cache
+
+### 1. 파일명 hash값 설정 && PlugIn : clean-webpack-plugin
+
+![browser-cache img](/src/images/browse_cache.png)
+cache의 구분 기준은 url! 로드하는 리소스 이름이 같은 경우에는 이전 결과를 보여준다.
+새로 bundling된 경우, bundle파일이 변경되었음을 알 수 있도록 파일명에 hash값 추가.  
+  
+clear-webpack-plugin: 기존의 bundle파일은 삭제(최신 bundle파일만 남는다)
+
+```yarn
+yarn add clear-webpack-plugin --dev
+```
+
+```javascript
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+  
+...
+  
+output: {
+    filename: 'bundle.[hash].js', // bundle파일이 변경되었음을 알수있도록 bundle.hash값.js => bundling시에만!
+    path: path.resolve(__dirname, 'dist')
+  },
+
+...
+  
+plugins: [  
+  ...  
+    new CleanWebpackPlugin(), // 최신 bundle파일만 남도록!!
+    new MiniCssExtractPlugin({filename: 'style.[contenthash]].css'}), // css 파일에도 hash값 적용
+  ]
+```
+
+> [contenthash]를 적용할 경우, 해당 파일의 수정이 일어난 경우에만 hash값 변경
+[hash]적용 시, js파일의 수정으로 build 시 css파일의 hash까지 변경된다. cache 사용이 무의미.
 
 ---
