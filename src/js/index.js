@@ -1,4 +1,5 @@
 import '../css/style.css';
+import $ from 'jquery';
 
 const currentTime = () => {
   const date = new Date();
@@ -16,5 +17,6 @@ setInterval(() => {
   timerElement.innerHTML = currentTime();
 }, 1000);
 
-console.log('d');
 document.querySelector('#content').appendChild(timerElement);
+console.log($('section').children().length);
+console.log('!!')
