@@ -9,6 +9,11 @@
       + 모든 모듈을 로드하기 위해 검색하는 시간을 단축
       + 사용하지 않는 코드를 제거
       + 파일의 크기를 축소
+  1. 구성
+      + entry: 의존성 그래프의 시작점. 엔트리를 통해서 필요한 모듈을 로딩한고 하나의 파일로 묶는다.
+      + output: 엔트리를 시작으로 의존되어 있는 모든 모듈을 하나로 묶은 번들된 결과물의 위치 지정.
+      + module: 웹팩은 자바스크립트 밖에 모른다. 비 자바스크립트 파일을 웹팩이 이해하게끔 변경하는 역할을 한다.
+      + plugin: 번들된 결과물을 처리하는 역할을 한다. Ex. 번들된 자바스크립트를 난독화
 
 ## STEP1 기본 설정
 
@@ -24,14 +29,6 @@ yarn add webpack webpack-cli ---dev
 ---
 
 ### 2. webpack.config.js 생성: entry / output 설정
-
-entry: 시작점. 모듈의 참조관계를 통해 의존성그래프를 만들기 위해 entry를 지정해준다.  
-output: bundle된 파일
-
-  
-<br>  
-
-_webpack.config.js_
 
 ```javascript
 const path = require('path');
@@ -273,4 +270,84 @@ optimization: { // webpack 최적화를 담당
     }
   }
 },
+```
+
+### 4. Minification &&  Mangling
+
+1. 어플리케이션 실행에 관여하지 않는 소스 제거 ex.주석, console.log  
+1. 공백제거 및 분기문 삼항연산으로 변경  
+1. 난독화
+을 통해 파일의 크기를 최소화 시킨다.  
+
+### HTML: html-webpack-plugin(minify)
+
+_webpack.config.js_
+
+```javascript
+plugins: [
+  new HtmlWebpackPlugin({
+      template: './src/index.html',
+      title: 'WEBPACK | PRACTICE',
+      meta: {
+        viewport: 'width=device-width, initial-scal,e=1.0',
+      },
+      minify: {
+        collapseWhitespace: true,
+        useShortDoctype: true,
+        removeScriptTypeAttributes: true
+      }
+    }),
+
+    ...
+],
+```
+
+#### CSS: optimize-css-assets-plugin / cssnano 사용
+
+```yarn
+yarn add cssnano optimize-css-assets-plugin --dev
+```
+
+_webpack.config.js_
+
+```javascript
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+
+plugins: [
+    ...  
+
+    new OptimizeCssAssetsPlugin({
+      assetNameRegExp: /\.css$/g,
+      cssProcessor: require('cssnano'),
+      cssProcessorPluginOptions: {
+        preset: ['default', { discardComments: { removeAll: true } }],
+      },
+      canPrint: true
+    })
+  ],
+```
+
+### javascript: terser-webpack-plugin
+
+webpack에 기본으로 포함되어있는 terser 모듈을 사용.
+
+```yarn
+yarn add terser-webpack-plugin --dev
+```
+
+_webpack.config.js_
+
+```javascript
+const TerserWebpackPlugin = require('terser-webpack-plugin');  
+
+...  
+
+optimization: { // webpack 최적화를 담당
+    ...  
+
+    minimize: true, // terser의 기본동작만 사용
+    minimizer: [new TerserWebpackPlugin({
+      cache: true // caching된 파일 사용해서 build 시간 단축
+    })]
+  },
 ```
