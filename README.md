@@ -215,14 +215,14 @@ plugins: [
 
 ---
 
-## STEP3 chunk
+### 2. chunk
 
 bundling을 통해 하나의 파일로 묶으면서 파일의 크기가 커지는 문제가 발생한다.  
 이를 chunk를 통해 bundle파일을 덩어리로 구분하여 나눈다.  
     - runtime chunk
     - vendor chunk
 
-### 1.runtimeChunk
+#### 1. runtimeChunk
 
 runtime에서 쓰이는 고정적인 모듈들과 나머지 모듈들을 구분.(runtime.js로 생성)  
   
@@ -243,7 +243,7 @@ optimization: { // webpack 최적화를 담당
 },
 ```
 
-### 2. vendorChunk
+#### 2. vendorChunk
 
 외부의 모듈들을 따로 vendors로 구분.(vendors.js로 생성)  
   
@@ -272,14 +272,14 @@ optimization: { // webpack 최적화를 담당
 },
 ```
 
-### 4. Minification &&  Mangling
+### 3. Minification &&  Mangling
 
 1. 어플리케이션 실행에 관여하지 않는 소스 제거 ex.주석, console.log  
 1. 공백제거 및 분기문 삼항연산으로 변경  
 1. 난독화
 을 통해 파일의 크기를 최소화 시킨다.  
 
-### HTML: html-webpack-plugin(minify)
+### 1. HTML: html-webpack-plugin(minify)
 
 _webpack.config.js_
 
@@ -302,7 +302,7 @@ plugins: [
 ],
 ```
 
-#### CSS: optimize-css-assets-plugin / cssnano 사용
+#### 2. CSS: optimize-css-assets-plugin / cssnano 사용
 
 ```yarn
 yarn add cssnano optimize-css-assets-plugin --dev
@@ -327,7 +327,7 @@ plugins: [
   ],
 ```
 
-### javascript: terser-webpack-plugin
+### 3. Javascript: terser-webpack-plugin
 
 webpack에 기본으로 포함되어있는 terser 모듈을 사용.
 
