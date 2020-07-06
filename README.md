@@ -173,7 +173,7 @@ module: {
 
 ---
 
-## STEP2 효과적 Cache
+## STEP2 효과적 Caching
 
 ### 1. 파일명 hash값 설정 && PlugIn : clean-webpack-plugin
 
@@ -279,7 +279,7 @@ optimization: { // webpack 최적화를 담당
 1. 난독화
 을 통해 파일의 크기를 최소화 시킨다.  
 
-### 1. HTML: html-webpack-plugin(minify)
+#### 1. HTML: html-webpack-plugin(minify)
 
 _webpack.config.js_
 
