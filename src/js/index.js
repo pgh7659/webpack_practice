@@ -19,4 +19,4 @@ setInterval(() => {
 
 document.querySelector('#content').appendChild(timerElement);
 console.log($('section').children().length);
-console.log('!!')
+console.log(IS_PRODUCTION);
