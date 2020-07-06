@@ -181,10 +181,10 @@ module: {
 cache의 구분 기준은 url! 로드하는 리소스 이름이 같은 경우에는 이전 결과를 보여준다.
 새로 bundling된 경우, bundle파일이 변경되었음을 알 수 있도록 파일명에 hash값 추가.  
   
-clear-webpack-plugin: 기존의 bundle파일은 삭제(최신 bundle파일만 남는다)
+clean-webpack-plugin: 기존의 bundle파일은 삭제(최신 bundle파일만 남는다)
 
 ```yarn
-yarn add clear-webpack-plugin --dev
+yarn add clean-webpack-plugin --dev
 ```
   
 <br>  
@@ -351,3 +351,176 @@ optimization: { // webpack 최적화를 담당
     })]
   },
 ```
+
+---
+
+## STEP3 Mode
+
++ development: 개발에 필요한 모듈들만 사용하여 build 속도 향상을 목표.  
++ production: 최적화 작업을 진행.
+
+webpack.common.js, webpack.dev.js, webpack.prod.js로 config 파일을 분리하여 관리  
+webpack-merge를 사용하여 각각 common과 합쳐서 개발과 사용 설정 파일을 생성한다.
+
+```yarn
+yarn add webpack-merge --dev
+```
+
+_webpack.common.js_
+
+```javascript
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = {
+  entry: './src/js/index.js',
+  output: {
+    filename: '[name].[chunkhash].js', // bundle파일이 변경되었음을 알수있도록 name.hash값.js
+    path: path.resolve(__dirname, 'dist')
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader
+          },
+          {
+            loader: 'css-loader'
+          }
+        ]
+      }
+    ]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      title: 'WEBPACK | PRACTICE',
+      meta: {
+        viewport: 'width=device-width, initial-scal,e=1.0',
+      },
+      minify: {
+        collapseWhitespace: true,
+        useShortDoctype: true,
+        removeScriptTypeAttributes: true
+      }
+    }),
+    new CleanWebpackPlugin(), // 최신 bundle파일만 남도록!!
+    new MiniCssExtractPlugin({filename: 'style.[contenthash].css'}), // css 파일에도 hash값 적용
+  ],
+  mode: 'none'
+}
+```
+
+_webpack.dev.js_
+
+```javascript
+const merge = require('webpack-merge');
+const common = require('./webpack.common');
+
+const config = {
+  mode: 'development'
+}
+
+module.exports = merge(common, config);
+```
+
+_webpack.prod.js_
+
+```javascript
+const merge = require('webpack-merge');
+const common = require('./webpack.common');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const TerserWebpackPlugin = require('terser-webpack-plugin');
+
+const config = {
+  plugins: [
+    new OptimizeCssAssetsPlugin({
+      assetNameRegExp: /\.css$/g,
+      cssProcessor: require('cssnano'),
+      cssProcessorPluginOptions: {
+        preset: ['default', { discardComments: { removeAll: true } }],
+      },
+      canPrint: true
+    })
+  ],
+  optimization: { // webpack 최적화를 담당
+    runtimeChunk: 'single',
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all'
+        }
+      }
+    },
+    minimize: true, // terser의 기본동작만 사용
+    minimizer: [new TerserWebpackPlugin({
+      cache: true // caching된 파일 사용해서 build 시간 단축
+    })]
+  },
+  mode: 'production'
+}
+
+module.exports = merge(common, config);
+```
+
+#### 실행 스크립트를 통해 전역변수 생성
+
+cross-env library설치
+> OS마다 다른 환경 변수 설정을 처리해준다.
+
+```yarn
+yarn add cross-env --dev
+```
+
+_package.json_
+
+```json
+"scripts": {
+    "dev": "cross-env WEBPACK_ENV=development webpack --config webpack.dev.js",
+    "build": "cross-env WEBPACK_ENV=production webpack --config webpack.prod.js"
+  },
+```  
+
+이제 WEBPACK_ENV 변수를 통해 development / production을 구분할 수 있다.  
+production 모드에서만 HtmlWebpackPlugin의 minify가 동작하도록 수정한다!  
+
+_webpack.common.js_
+
+```javascript
+const webpack = require('webpack'); // DefinePlugin 사용하기 위해
+const isProduction = process.env.WEBPACK_ENV === 'production';  
+
+...  
+
+plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      title: 'WEBPACK | PRACTICE',
+      meta: {
+        viewport: 'width=device-width, initial-scal,e=1.0',
+      },
+      minify: isProduction ? {
+        collapseWhitespace: true,
+        useShortDoctype: true,
+        removeScriptTypeAttributes: true
+      } : false
+    }),  
+
+    ...  
+
+    new webpack.DefinePlugin({
+      IS_PRODUCTION: isProduction
+    })
+  ],
+```
+
+> webpack.DefinePlugin : build 시, 전역에서 사용 가능한 변수 생성(runtime 시에는 사용 불가!)  
+
+### webpack-dev-server
+
