@@ -524,3 +524,73 @@ plugins: [
 
 ### webpack-dev-server
 
+1. 로컬에서 사용할 개발용 서버를 제공합니다.
+1. 이 기능을 사용하여 소스 파일을 감시하고 내용이 변경될 마다 번들을 다시 컴파일 합니다.
+1. 수시로 새로고침을 하지 않아 편리합니다.  
+
+```yarn
+yarn add webpack-dev-server --dev
+```  
+
+_package.json_  
+
+```json
+"scripts": {
+    "devstart": "cross-env WEBPACK_ENV=development webpack-dev-server --config webpack.dev.js",  
+  },
+```
+
+_webpack.dev.js_  
+
+```javascript
+const config = {
+  ...  
+
+  devServer: {
+    open: true, // 실행 시, 기본 브라우저로 연다.
+    overlay: true, // 오류 발생 시, 화면에 출력.
+    historyApiFallback: {
+      rewrites: [
+        { from: /^\/subpage$/, to: './src/pages/subpage.html' }, // 특정 url에 대해 html 지정
+        { from: /./, to: './src/pages/404.html' }
+      ]
+    },
+    port: 9090 // 포트 설정
+  }
+}
+```
+
+## STEP4 File-Loader
+
+파일을 입력받아 출력해준다.
+
+## STEP5 URL-Loader
+
+리소스들을 문자열 형태로 변환해준다.
+url-loader 이점: 리소스 요청수를 줄일 수 있다.
+url-loader의 fallback은 file-loader가 기본값이다!(option-fallback에서 다른 로더로 지정할 수 있다.)
+
+```yarn
+yarn add url-loader --dev
+```
+
+```javascript
+module: {
+    rules: [  
+      ...  
+
+      {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192 // 이 이상의 용량은 file-loader로 처리!
+            }
+          }
+        ]
+      }
+    ]
+  },  
+  ...
+```
