@@ -1,5 +1,7 @@
 import '../css/style.css';
 import $ from 'jquery';
+import testImg from '../images/testImg.png';
+import testSvg from '../images/Freesample.svg';
 
 const currentTime = () => {
   const date = new Date();
@@ -13,10 +15,14 @@ const currentTime = () => {
 const timerElement = document.createElement('article');
 timerElement.id = 'timer';
 
+const imgElement = document.createElement('img');
+imgElement.src = testSvg;
+
 setInterval(() => {
   timerElement.innerHTML = currentTime();
 }, 1000);
 
 document.querySelector('#content').appendChild(timerElement);
+document.querySelector('#content').appendChild(imgElement);
 console.log($('section').children().length);
 console.log(IS_PRODUCTION);

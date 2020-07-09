@@ -559,3 +559,38 @@ const config = {
   }
 }
 ```
+
+## STEP4 File-Loader
+
+파일을 입력받아 출력해준다.
+
+## STEP5 URL-Loader
+
+리소스들을 문자열 형태로 변환해준다.
+url-loader 이점: 리소스 요청수를 줄일 수 있다.
+url-loader의 fallback은 file-loader가 기본값이다!(option-fallback에서 다른 로더로 지정할 수 있다.)
+
+```yarn
+yarn add url-loader --dev
+```
+
+```javascript
+module: {
+    rules: [  
+      ...  
+
+      {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192 // 이 이상의 용량은 file-loader로 처리!
+            }
+          }
+        ]
+      }
+    ]
+  },  
+  ...
+```
