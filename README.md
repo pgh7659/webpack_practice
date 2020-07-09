@@ -564,6 +564,48 @@ const config = {
 
 파일을 입력받아 출력해준다.
 
+```yarn
+yarn add file-loader --dev
+```
+
+_webpack.common.js_
+
+```javascript
+module: {
+    rules: [  
+      ...  
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name() {
+                if(!isProduction) {
+                  return '[path][name].[ext]'
+                }
+                return '[contenthash].[ext]';
+              },
+              publicPath: isProduction ? 'images/' : '', // 파일의 path에 images를 붙여준다.
+              outputPath: isProduction ? 'images/' : '' // dist 폴더에 images 디렉토리 내에 위치
+            }
+          }
+        ]
+      }
+```
+
+_index.js_
+
+```javascript
+import testImg from '../images/testImg.png';
+
+...  
+
+const imgElement = document.createElement('img');
+imgElement.src = testImg;
+document.querySelector('#content').appendChild(imgElement);
+```
+
 ## STEP5 URL-Loader
 
 리소스들을 문자열 형태로 변환해준다.
@@ -573,6 +615,8 @@ url-loader의 fallback은 file-loader가 기본값이다!(option-fallback에서 
 ```yarn
 yarn add url-loader --dev
 ```
+
+_webpack.common.js_
 
 ```javascript
 module: {
@@ -593,4 +637,16 @@ module: {
     ]
   },  
   ...
+```  
+
+_index.js_
+
+```javascript
+import testSvg from '../images/Freesample.svg';
+
+...  
+
+const imgElement = document.createElement('img');
+imgElement.src = testSvg;
+document.querySelector('#content').appendChild(imgElement);
 ```
